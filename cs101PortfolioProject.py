@@ -7,4 +7,10 @@ c = {'activities': ['sedentary', 'lightAct', 'moderateAct', 'highAct'],
      'leanGaining': [14, 16, 18, 20],
      'maintaining': [12, 14, 16, 18]}
 df = pd.DataFrame(data=c)
-print(df)
+# print(df)
+
+location = "Codecademy/macros.csv"
+macros = pd.read_csv(location)
+print(macros[macros['food']=='apple', 3])
+
+
