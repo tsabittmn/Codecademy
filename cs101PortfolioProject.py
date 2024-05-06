@@ -26,6 +26,11 @@ fitGoal = input("Please choose your body composition goal:\n"
                  "'b': lean gaining\n"
                  "'c': maintaining\n"
                  "Answer: ")
+treats = input("Choose treats to add:\n"
+               "'a': dark chocolate\n"
+               "'b': crackers & cheese\n"
+               "'c': None\n"
+               "Answer: ")
 
 
 
