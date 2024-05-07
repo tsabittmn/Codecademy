@@ -2,25 +2,38 @@
 import pandas as pd
 
 def loadData():
-     """description"""
+     """load datasets that are needed for the program to run"""
 
      # load calPerAct data
-     c = {'activities': ['sedentary', 'lightAct', 'moderateAct', 'highAct'], 
-          'cutting': [8, 10, 12, 14],
+     calPerAct = pd.DataFrame( 
+          {'cutting': [8, 10, 12, 14],
           'leanGaining': [14, 16, 18, 20],
-          'maintaining': [12, 14, 16, 18]}
+          'maintaining': [12, 14, 16, 18]},
+          index = ['sedentary', 'lightAct', 'moderateAct', 'highAct'])
+     
+     # load macPerGoal data
+     macPerGoal = pd.DataFrame(
+          {'protein': [1.2, 1.0, 1.0],
+          'carbs': [2.0, 2.0, 2.0],
+          'fat': [0.4, 0.4, 0.4]},
+          index = ['cutting', 'leanGaining', 'maintaining'])
 
      # load macros data
      location = "Codecademy/macros.csv"
      macros = pd.read_csv(location)
 
-     return pd.DataFrame(data=c), macros
+     # load treats data
+     location = "Codecademy/treats.csv"
+     treats = pd.read_csv(location)
+
+     return calPerAct, macPerGoal, macros, treats
 
 def promptWeight():
      """description"""
      answer = input("What is your weight(kg)?\n"
                     "Answer: ")
-     return answer
+     
+     return float(answer)*2.20462
 
 def promptAct():
      """description"""
@@ -36,11 +49,8 @@ def promptAct():
           return 'lightAct'
      elif answer == 'c':
           return 'moderateAct'
-     elif answer == 'd':
-          return 'highAct'
      else:
-          print("That option is not exist!")
-          return promptAct()
+          return 'highAct'
      
 def promptGoal():
      """description"""
@@ -64,18 +74,37 @@ def promptUser():
      weight = promptWeight()
      actLevel = promptAct()
      fitGoal = promptGoal()
+     
+     # check if actLevel is sedentary and fitGoal is leanGaining
+     while actLevel == 'sedentary' and fitGoal == 'leanGaining':
+          print("You shouldn't be lean gaining!")
+          fitGoal = promptGoal()
+     
      return weight, actLevel, fitGoal         
      
-def calcMacros():
+def calcMacros(weight, actLevel, fitGoal):
+     """
+     calculate user's target macros
+     given weight, activity level, and fitness
+     goal
+     """
+     targetCal = round(weight * calPerAct.loc[actLevel, fitGoal])
+     targetMac = weight * macPerGoal.loc[fitGoal]
+     targetMac['calories'] = targetCal
+
+     return targetMac
+
+def chooseTreats():
      """description"""
-    
+     
+     pass
+
 # run the code
-calPerAct, macros = loadData()
+calPerAct, macPerGoal, macros, treats = loadData()
 weight, actLevel, fitGoal = promptUser()
+targetMac = calcMacros(weight, actLevel, fitGoal)
 
-
-
-
-
+# tests
+print(targetMac)
 
 
