@@ -95,16 +95,34 @@ def calcMacros(weight, actLevel, fitGoal):
      return targetMac
 
 def chooseTreats():
-     """description"""
-     
-     pass
+     """
+     Prompt user to choose treats to add to the menu
+     from the 'treats' dataset.
+
+     return: list of choosen treats.
+     """
+     chosenTreats = []
+     treatsList = [treats['food']]
+     done = False
+     while done != True:
+          print("Choose treats to add to your daily meals:")
+          for treat in treatsList:
+                    print(treat)
+          print("done")
+          choice = input("Answer: ")
+          if choice == "done":
+               done = True
+          elif choice in treatsList:
+               chosenTreats.append(choice)
+               treatsList.remove(choice)
+       
+     return chosenTreats
 
 # run the code
 calPerAct, macPerGoal, macros, treats = loadData()
-weight, actLevel, fitGoal = promptUser()
-targetMac = calcMacros(weight, actLevel, fitGoal)
+# weight, actLevel, fitGoal = promptUser()
+# targetMac = calcMacros(weight, actLevel, fitGoal)
 
 # tests
-print(targetMac)
-
+print(chooseTreats())
 
