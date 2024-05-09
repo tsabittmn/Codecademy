@@ -94,35 +94,51 @@ def calcMacros(weight, actLevel, fitGoal):
 
      return targetMac
 
-def chooseTreats():
+def chooseTreats(targetCalories, treats):
      """
      Prompt user to choose treats to add to the menu
      from the 'treats' dataset.
 
      return: list of choosen treats.
      """
-     chosenTreats = []
-     treatsList = [treats['food']]
-     done = False
-     while done != True:
+
+     # keep track of variables
+     treatsList = []
+     maxTreats = targetCalories*0.2
+
+     # show treats options
+     while True:
           print("Choose treats to add to your daily meals:")
-          for treat in treatsList:
-                    print(treat)
-          print("done")
+          for treat in treats['food']:
+               print("- " + treat) 
           choice = input("Answer: ")
-          if choice == "done":
-               done = True
-          elif choice in treatsList:
-               chosenTreats.append(choice)
-               treatsList.remove(choice)
+          if choice in treatsList:
+               print("That treats already added to your meals!")
+          elif choice == 'done':
+               break
+          elif choice not in treats['food'].values:
+               print("Treats not found! Please type the correct treats!")
+          elif choice in treats['food'].values:
+               calChoice = treats.loc[treats['food'] == choice, 'calories'].item()
+               if maxTreats >= calChoice and\
+                    choice not in treatsList:
+                    treatsList.append(choice)
+                    maxTreats -= calChoice
+                    print(choice, "added to your treats!")
+               elif maxTreats <= calChoice:
+                    print('Chosen treats calories: ', calChoice)
+                    print("Max calories: ", maxTreats)
+                    print("Exceed maximum calories for treats!")
+          
+     # update target macros
        
-     return chosenTreats
+     
+     return treatsList 
 
 # run the code
 calPerAct, macPerGoal, macros, treats = loadData()
-# weight, actLevel, fitGoal = promptUser()
-# targetMac = calcMacros(weight, actLevel, fitGoal)
+weight, actLevel, fitGoal = promptUser()
+targetMac = calcMacros(weight, actLevel, fitGoal)
 
 # tests
-print(chooseTreats())
-
+print(chooseTreats(targetMac['calories'], treats))
