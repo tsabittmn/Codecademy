@@ -94,7 +94,7 @@ def calcMacros(weight, actLevel, fitGoal):
 
      return targetMac
 
-def chooseTreats(targetCalories, treats):
+def chooseTreats(treats, targetMac):
      """
      Prompt user to choose treats to add to the menu
      from the 'treats' dataset.
@@ -104,13 +104,14 @@ def chooseTreats(targetCalories, treats):
 
      # keep track of variables
      treatsList = []
-     maxTreats = targetCalories*0.2
+     maxTreats = targetMac['calories']*0.2
 
      # show treats options
      while True:
           print("Choose treats to add to your daily meals:")
           for treat in treats['food']:
                print("- " + treat) 
+          print('- (done)')
           choice = input("Answer: ")
           if choice in treatsList:
                print("That treats already added to your meals!")
@@ -131,14 +132,23 @@ def chooseTreats(targetCalories, treats):
                     print("Exceed maximum calories for treats!")
           
      # update target macros
-       
-     
-     return treatsList 
+     # for each treat in treatsList
+     for treat in treatsList:
+
+          # for each macro in targetMac
+          for mac in targetMac.index:
+
+               # reduce macro by macro from treat
+               targetMac[mac] -= treats.loc[treats['food'] == treat, mac].item()
+
+     return treatsList, targetMac
 
 # run the code
 calPerAct, macPerGoal, macros, treats = loadData()
 weight, actLevel, fitGoal = promptUser()
 targetMac = calcMacros(weight, actLevel, fitGoal)
+treatsList, targetMac = chooseTreats(treats, targetMac)
 
 # tests
-print(chooseTreats(targetMac['calories'], treats))
+# targetMac = calcMacros(65*2.20462, 'moderateAct', 'leanGaining')
+
