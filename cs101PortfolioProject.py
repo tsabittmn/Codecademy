@@ -20,11 +20,11 @@ def loadData():
 
      # load macros data
      location = "Codecademy/macros.csv"
-     macros = pd.read_csv(location)
+     macros = pd.read_csv(location, header=0, index_col=0)
 
      # load treats data
      location = "Codecademy/treats.csv"
-     treats = pd.read_csv(location)
+     treats = pd.read_csv(location, header=0, index_col=0)
 
      return calPerAct, macPerGoal, macros, treats
 
@@ -143,12 +143,50 @@ def chooseTreats(treats, targetMac):
 
      return treatsList, targetMac
 
+class Food:
+     def __init__(self, name, amount):
+          self.name = name
+          self.amount = amount
+          self.calories = macros.at[name, 'calories']*(amount/100)
+          self.protein = macros.at[name, 'protein']*(amount/100)
+          self.carbs = macros.at[name, 'carbs']*(amount/100)
+          self.fat = macros.at[name, 'fat']*(amount/100)
+          self.categories = macros.at[name, 'categories']
+    
+     def __repr__(self):
+          return self.name + " " + str(self.amount) + " gr"
+     
+     def increaseAmount(self, name, amount):
+          self.amount += 1
+          self.calories = macros.at[name, 'calories']*(amount/100)
+          self.protein = macros.at[name, 'protein']*(amount/100)
+          self.carbs = macros.at[name, 'carbs']*(amount/100)
+          self.fat = macros.at[name, 'fat']*(amount/100)
+
 # run the code
 calPerAct, macPerGoal, macros, treats = loadData()
-weight, actLevel, fitGoal = promptUser()
-targetMac = calcMacros(weight, actLevel, fitGoal)
-treatsList, targetMac = chooseTreats(treats, targetMac)
+# weight, actLevel, fitGoal = promptUser()
+# targetMac = calcMacros(weight, actLevel, fitGoal)
+# treatsList, targetMac = chooseTreats(treats, targetMac)
 
 # tests
 # targetMac = calcMacros(65*2.20462, 'moderateAct', 'leanGaining')
+rice = Food('rice', 50)
+print(rice.amount)
+print(rice.calories)
+print(rice.protein)
+print(rice.carbs)
+print(rice.fat)
+print(rice.categories)
+
+for i in range(20):
+     rice.increaseAmount(rice.name, rice.amount)
+
+print(rice.amount)
+print(rice.calories)
+print(rice.protein)
+print(rice.carbs)
+print(rice.fat)
+print(rice.categories)
+
 

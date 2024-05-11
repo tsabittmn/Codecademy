@@ -1,4 +1,4 @@
-Food,calories,protein,carbs,fat,categories
+food,calories,protein,carbs,fat,categories
 oatmeal,379,13,55,9,carbs
 wheyprotein,402,75,13,5,protein
 apple,52,0,13,0,carbs
