@@ -143,6 +143,36 @@ def chooseTreats(treats, targetMac):
 
      return treatsList, targetMac
 
+def promptMenu():
+     """
+     Prompt user to choose which food for each meal.
+     
+     Return: dictionary with format {meal1:[food1, food2, food3], meal2:[], etc.}
+     """
+     foodChoice = {'breakfast':[], 'lunch':[], 'dinner':[]}
+     
+     # iterate foodChoice
+     for meal in foodChoice:
+          done = False
+          while done == False:
+               print(f'Please select what you would like to add to your {meal}.')
+               # show options
+               for food in macros.index:
+                    print('-', food)
+               # input
+               print(f"Type 'done' if you have finished selecting your {meal} items.")
+               choice = input('Answer: ')
+
+               # check if exist in data
+               if choice in macros.index:
+                    foodChoice[meal].append(choice)
+               elif choice == 'done':
+                    done = True
+               else:
+                    print("That food doesn't exist in macros.csv data!")   
+     
+     return foodChoice
+
 class Food:
      def __init__(self, name, amount):
           self.name = name
@@ -163,6 +193,13 @@ class Food:
           self.carbs = macros.at[name, 'carbs']*(amount/100)
           self.fat = macros.at[name, 'fat']*(amount/100)
 
+     def decreaseAmount(self, name, amount):
+          self.amount -= 1
+          self.calories = macros.at[name, 'calories']*(amount/100)
+          self.protein = macros.at[name, 'protein']*(amount/100)
+          self.carbs = macros.at[name, 'carbs']*(amount/100)
+          self.fat = macros.at[name, 'fat']*(amount/100)
+
 # run the code
 calPerAct, macPerGoal, macros, treats = loadData()
 # weight, actLevel, fitGoal = promptUser()
@@ -171,22 +208,4 @@ calPerAct, macPerGoal, macros, treats = loadData()
 
 # tests
 # targetMac = calcMacros(65*2.20462, 'moderateAct', 'leanGaining')
-rice = Food('rice', 50)
-print(rice.amount)
-print(rice.calories)
-print(rice.protein)
-print(rice.carbs)
-print(rice.fat)
-print(rice.categories)
-
-for i in range(20):
-     rice.increaseAmount(rice.name, rice.amount)
-
-print(rice.amount)
-print(rice.calories)
-print(rice.protein)
-print(rice.carbs)
-print(rice.fat)
-print(rice.categories)
-
-
+print(promptMenu())
