@@ -205,7 +205,7 @@ calPerAct, macPerGoal, macros, treats = loadData()
 # weight, actLevel, fitGoal = promptUser()
 # targetMac = calcMacros(weight, actLevel, fitGoal)
 # treatsList, targetMac = chooseTreats(treats, targetMac)
+foodChoice = promptMenu()
 
 # tests
 # targetMac = calcMacros(65*2.20462, 'moderateAct', 'leanGaining')
-print(promptMenu())
