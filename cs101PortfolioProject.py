@@ -1,26 +1,89 @@
-# import modules
+# imports
 import pandas as pd
+
+# clas definitions
+class MealPlan:
+    """A class that keep all meals (breakfast, lunch,  & dinner)
+    and their foods."""
+
+    def __init__(self, meal_list):
+        """
+        Initialize the MealPlan instance.
+
+        :param meal_list: A list consists of Meal objects.
+        """
+        self.meal_list = meal_list
+        self.total_calories = 0
+        self.total_proteins = 0
+        self.total_carbs = 0
+        self.total_fats = 0
+        self.reach_target = False
+    
+    def update_macros(self):
+        pass
+
+    def show_result(self):
+        pass
+
+    def update_target(self):
+        pass
+
+class Meal:
+    """A class that represent particular meal in the meal
+    plan, and keep foods in it."""
+    
+    def __init__(self, food_list):
+        """
+        Initialize the Meal instance.
+
+        :param food_list: A list consists of Food objects.
+        """
+        self.food_list = food_list
+        self.total_calories = 0
+        self.total_proteins = 0
+        self.total_carbs = 0
+        self.total_fats = 0
+    
+    def update_macros(self):
+        pass
+
+    def giveResult(self):
+        pass
+    
+class Food:
+    """A class that represent particular food in the meal, 
+    and keep amount, categories, and macros in it."""
+
+    def __init__(self, name, categories, macrosDataset):
+        """
+        Initialize the Food instance.
+
+        :param food_list: A list consists of Food objects.
+        """
+        self.name = name
+        self.categories = categories
+        self.amount = 0
+        # self.macros_dict = macros_dict
+
 
 # function definitions
 def loadDatasets():
     """
     Load the required datasets to run the program.
 
-    Upon calling, this function will returns 4 datasets needed to 
+    Upon calling, this function will returns 3 datasets needed to 
     develop the meal plan.
 
     Returns:
         DataFrame: macros.csv
-        DataFrame: treats.csv
         DataFrame: caloriePerAct.csv
         DataFrame: macrosPerGoal.csv
     """
     macros = pd.read_csv('Codecademy/macros.csv')
-    treats = pd.read_csv('Codecademy/treats.csv')
     caloriePerAct = pd.read_csv('Codecademy/caloriePerAct.csv', index_col=0)
     macrosPerGoal = pd.read_csv('Codecademy/macrosPerGoal.csv', index_col=0)
 
-    return macros, treats, caloriePerAct, macrosPerGoal
+    return macros, caloriePerAct, macrosPerGoal
 
 def getUserInfo():
     """
@@ -80,11 +143,11 @@ def promptAct():
      if answer == 'a':
           return 'sedentary'
      elif answer == 'b':
-          return 'lightAct'
+          return 'light'
      elif answer == 'c':
-          return 'moderateAct'
+          return 'moderate'
      else:
-          return 'highAct'
+          return 'high'
      
 def promptGoal():
      """
@@ -135,7 +198,7 @@ def calcMacros(weight, actLevel, fitGoal, caloriePerAct, macrosPerGoal):
 
     return targetMacros
 
-def getMenu(treats, macros, targetMacros):
+def getMenu(macros, targetMacros):
     """
     Prompt user to choose treats and foods.
 
@@ -144,7 +207,6 @@ def getMenu(treats, macros, targetMacros):
     meal plan.
 
     Args:
-        treats (DataFrame): The treats dataset.
         macros (DataFrame): The macros dataset.
         targetMacros (DataFrame): User's targe macros.
 
@@ -152,12 +214,12 @@ def getMenu(treats, macros, targetMacros):
         list: Treats choice
         dict: Food choices
     """
-    treatChoice = promptTreat(treats, targetMacros)
+    treatChoice = promptTreat(macros, targetMacros)
     foodChoice = promptFood(macros)
 
     return treatChoice, foodChoice
 
-def promptTreat(treats, targetMacros):
+def promptTreat(macros, targetMacros):
     """
     Prompt user for treats to add.
 
@@ -166,7 +228,7 @@ def promptTreat(treats, targetMacros):
     This function returns list of treats chosen.
 
     Args:
-        treats (DataFrame): The treats dataset.
+        macros (DataFrame): The macros dataset.
         targetMacros (DataFrame): User's target macros.
 
     Returns:
@@ -179,7 +241,7 @@ def promptTreat(treats, targetMacros):
     # keep asking user to choose until done
     while True:
           print("Choose treats to add to your daily meals:")
-          for treat in treats['food']:
+          for treat in macros[macros['categories']=='treat']['food']:
                print("- " + treat) 
           print('- (done)')
           choice = input("Answer: ")
@@ -187,10 +249,10 @@ def promptTreat(treats, targetMacros):
                print("That treats already added to your meals!")
           elif choice == 'done':
                break
-          elif choice not in treats['food'].values:
+          elif choice not in macros[macros['categories']=='treat']['food'].values:
                print("Treats not found! Please type the correct treats!")
-          elif choice in treats['food'].values:
-               calChoice = treats.loc[treats['food'] == choice, 'calories'].item()
+          elif choice in macros[macros['categories']=='treat']['food'].values:
+               calChoice = macros.loc[macros['food'] == choice, 'calories'].item()
                if maxCalories >= calChoice and choice not in treatChoice:
                     treatChoice.append(choice)
                     maxCalories -= calChoice
@@ -247,4 +309,12 @@ def promptFood(macros):
     
     return foodChoice
 
-#### TESTING ####
+def createMealPlan(targetMacros, treatChoice, foodChoice):
+    pass
+
+# main execution code
+if __name__ == '__main__':
+    macros, caloriePerAct, macrosPerGoal = loadDatasets()
+    weight, fitGoal, actLevel = getUserInfo()
+    targetMacros = calcMacros(weight, actLevel, fitGoal, caloriePerAct, macrosPerGoal)
+    treatChoice, foodChoice = getMenu(macros, targetMacros)
