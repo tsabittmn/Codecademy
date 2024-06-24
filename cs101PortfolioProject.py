@@ -6,33 +6,68 @@ class MealPlan:
     """A class that keep all meals (breakfast, lunch,  & dinner)
     and their foods."""
 
-    def __init__(self, meal_list):
+    def __init__(self, targetMacros, meal_list=[]):
         """
         Initialize the MealPlan instance.
 
+        :param targetMacros: A DataFrame contains user's target macros.
         :param meal_list: A list consists of Meal objects.
         """
         self.meal_list = meal_list
+        self.targetMacros = targetMacros
         self.total_calories = 0
         self.total_proteins = 0
         self.total_carbs = 0
         self.total_fats = 0
-        self.reach_target = False
     
     def update_macros(self):
-        pass
+        """Update meal plan macros after change in amount/number of food"""
+
+        # restart meal plan's macros
+        self.total_calories = 0
+        self.total_proteins = 0
+        self.total_carbs = 0
+        self.total_fats = 0
+        # iterate over self.meal_list
+        for meal in self.meal_list:
+            # add calories
+            self.total_calories += meal.total_calories
+            # add proteins
+            self.total_proteins += meal.total_proteins
+            # add carbs
+            self.total_carbs += meal.total_carbs
+            # add fats
+            self.total_fats += meal.total_fats
 
     def show_result(self):
-        pass
+        """Return dictionary of meal plan's total macros"""
 
-    def update_target(self):
-        pass
+        return {'calories':self.total_calories,
+                'proteins':self.total_proteins,
+                'carbs':self.total_carbs,
+                'fats':self.total_fats}
+
+    def reach_target_calories(self):
+        """Check whether target calories reached"""
+
+        if (self.total_calories >= self.targetMacros['calories'].item()*0.95) and\
+            (self.total_calories <= self.targetMacros['calories'].item()*1.05):
+            return True
+        return False
+    
+    def reach_target_proteins(self):
+        """Check whether target protein reached"""
+
+        if (self.total_proteins >= self.targetMacros['proteins'].item()*0.9) and\
+            (self.total_proteins <= self.targetMacros['proteins'].item()*1.1):
+            return True
+        return False
 
 class Meal:
     """A class that represent particular meal in the meal
     plan, and keep foods in it."""
     
-    def __init__(self, food_list):
+    def __init__(self, food_list=[]):
         """
         Initialize the Meal instance.
 
@@ -44,28 +79,82 @@ class Meal:
         self.total_carbs = 0
         self.total_fats = 0
     
-    def update_macros(self):
-        pass
+    def add_food(self, food):
+        """Add food object into food list and update macros"""
 
-    def giveResult(self):
-        pass
+        self.food_list.append(food)
+        self.update_macros()
+    
+    def update_macros(self):
+        """Update meal macros after change in amount/number of food"""
+
+        # restart meal's macros
+        self.total_calories = 0
+        self.total_proteins = 0
+        self.total_carbs = 0
+        self.total_fats = 0
+        # iterate over self.food_list
+        for food in self.food_list:
+            # add calories
+            self.total_calories += food.total_calories
+            # add proteins
+            self.total_proteins += food.total_proteins
+            # add carbs
+            self.total_carbs += food.total_carbs
+            # add fats
+            self.total_fats += food.total_fats
+
+    def showResult(self):
+        """Return dictionary of meal's total macros to be calculated 
+        in MealPlan class"""
+
+        return {'calories':self.total_calories,
+                'proteins':self.total_proteins,
+                'carbs':self.total_carbs,
+                'fats':self.total_fats}
     
 class Food:
     """A class that represent particular food in the meal, 
     and keep amount, categories, and macros in it."""
 
-    def __init__(self, name, categories, macrosDataset):
+    def __init__(self, name, macros_df):
         """
         Initialize the Food instance.
 
         :param food_list: A list consists of Food objects.
         """
         self.name = name
-        self.categories = categories
+        self.categories = macros_df[macros_df['food']==name]['categories'].item()
         self.amount = 0
-        # self.macros_dict = macros_dict
+        self.macros_dict = {'calories':macros_df[macros_df['food']==name]['calories'].item(),
+                            'proteins':macros_df[macros_df['food']==name]['proteins'].item(),
+                            'carbs':macros_df[macros_df['food']==name]['carbs'].item(),
+                            'fats':macros_df[macros_df['food']==name]['fats'].item()}
+        self.total_calories = 0
+        self.total_proteins = 0
+        self.total_carbs = 0
+        self.total_fats = 0
+    
+    def increase_amount(self):
+        """Increase food amount by 5 gr"""
 
+        self.amount += 5
+        self.update_macros()
 
+    def decrease_amount(self):
+        """Decrease food amount by 5 gr"""
+
+        self.amount -= 5
+        self.update_macros()
+
+    def update_macros(self):
+        """Update food macros after change in amount"""
+
+        self.total_calories = self.macros_dict['calories']*self.amount/100
+        self.total_proteins = self.macros_dict['proteins']*self.amount/100
+        self.total_carbs = self.macros_dict['carbs']*self.amount/100
+        self.total_fats = self.macros_dict['fats']*self.amount/100
+        
 # function definitions
 def loadDatasets():
     """
@@ -310,11 +399,41 @@ def promptFood(macros):
     return foodChoice
 
 def createMealPlan(targetMacros, treatChoice, foodChoice):
-    pass
+    pass # maybe should be a method of MealPlan class
 
 # main execution code
-if __name__ == '__main__':
-    macros, caloriePerAct, macrosPerGoal = loadDatasets()
-    weight, fitGoal, actLevel = getUserInfo()
-    targetMacros = calcMacros(weight, actLevel, fitGoal, caloriePerAct, macrosPerGoal)
-    treatChoice, foodChoice = getMenu(macros, targetMacros)
+# if __name__ == '__main__':
+#     macros, caloriePerAct, macrosPerGoal = loadDatasets()
+#     weight, fitGoal, actLevel = getUserInfo()
+#     targetMacros = calcMacros(weight, actLevel, fitGoal, caloriePerAct, macrosPerGoal)
+#     treatChoice, foodChoice = getMenu(macros, targetMacros)
+
+### TEST ###
+macros = pd.read_csv('Codecademy/macros.csv')
+targetMacros = pd.DataFrame({'calories':[2434.5],
+                             'proteins':[148.9],
+                             'carbs':[312.4],
+                             'fats':[60.7]})
+breakfast = Meal()
+breakfast.total_calories = 788.4
+breakfast.total_proteins = 36.7
+breakfast.total_carbs = 99.1
+breakfast.total_fats = 	26.2
+
+lunch = Meal()
+lunch.total_calories = 700.7
+lunch.total_proteins = 	0.6
+lunch.total_carbs = 95.6
+lunch.total_fats = 	6.6
+
+dinner = Meal()
+dinner.total_calories = 752.2
+dinner.total_proteins = 56.2
+dinner.total_carbs = 95.6
+dinner.total_fats = 14.2
+
+meal_plan = MealPlan(targetMacros=targetMacros, meal_list=[breakfast, lunch, dinner])
+meal_plan.update_macros()
+print("target proteins:", meal_plan.targetMacros['proteins'].item())
+print("total proteins:", meal_plan.show_result()['proteins'])
+print("target reached:", meal_plan.reach_target_proteins())
