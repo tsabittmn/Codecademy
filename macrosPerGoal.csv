@@ -1,4 +1,4 @@
-goal,protein,carbs,fat
+goal,proteins,carbs,fats
 cutting,1.2,2.0,0.4
 leanGaining,1.0,2.0,0.4
 maintaining,1.0,2.0,0.4
