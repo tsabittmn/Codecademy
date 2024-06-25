@@ -13,7 +13,7 @@ class MealPlan:
         :param targetMacros: A DataFrame contains user's target macros.
         :param meal_list: A list consists of Meal objects.
         """
-        self.meal_list = meal_list
+        self.meal_list = meal_list  # --> contains: breakfast, lunch, dinner, treats
         self.targetMacros = targetMacros
         self.total_calories = 0
         self.total_proteins = 0
@@ -62,6 +62,58 @@ class MealPlan:
             (self.total_proteins <= self.targetMacros['proteins'].item()*1.1):
             return True
         return False
+    
+
+    def createMealPlan(self):
+        """Iterate until target macros reached"""
+
+        # add proteins up to 80%
+        # define 80% proteins divided by 3 meals
+        protein_80 = (self.targetMacros['proteins'].item()*0.8)/3
+        # for each meal (except treats)
+        for meal in self.meal_list[:-1]:
+            # add protein source until reach 80%
+            protein_sources = []
+            for food in meal.food_list:
+                if food.categories == 'protein':
+                    protein_sources.append(food)
+            # number of protein sources in the meal
+            n_proteins = len(protein_sources)
+            # distribute target protein of the meal to protein sources
+            protein_each_food = protein_80/n_proteins
+            for food in protein_sources:
+                food_amount = (protein_each_food/food.macros_dict['proteins'])*100
+                food.increase_amount(food_amount)
+            # update macros
+            meal.update_macros()
+        self.update_macros()
+
+        # add carbs up to 80%
+        # define 80% carbs divided by 3 meals
+        carb_80 = (self.targetMacros['carbs'].item()*0.8)/3
+        # for each meal (except treats)
+        for meal in self.meal_list[:-1]:
+            # add carb source until reach 80%
+            carb_sources = []
+            for food in meal.food_list:
+                if food.categories == 'carb':
+                    carb_sources.append(food)
+            # number of carb sources in the meal
+            n_carb = len(carb_sources)
+            # distribute target carb of the meal to carb sources
+            carb_each_food = carb_80/n_carb
+            for food in carb_sources:
+                food_amount = (carb_each_food/food.macros_dict['carbs'])*100
+                food.increase_amount(food_amount)
+            # update macros
+            meal.update_macros()
+        self.update_macros()
+
+        # add fats up to 80%
+
+        # add treats
+
+        # adjust until target reached
 
 class Meal:
     """A class that represent particular meal in the meal
@@ -78,12 +130,6 @@ class Meal:
         self.total_proteins = 0
         self.total_carbs = 0
         self.total_fats = 0
-    
-    def add_food(self, food):
-        """Add food object into food list and update macros"""
-
-        self.food_list.append(food)
-        self.update_macros()
     
     def update_macros(self):
         """Update meal macros after change in amount/number of food"""
@@ -121,7 +167,8 @@ class Food:
         """
         Initialize the Food instance.
 
-        :param food_list: A list consists of Food objects.
+        :param name: Food name in macros dataset.
+        :param macros_df: The macros dataset
         """
         self.name = name
         self.categories = macros_df[macros_df['food']==name]['categories'].item()
@@ -135,16 +182,16 @@ class Food:
         self.total_carbs = 0
         self.total_fats = 0
     
-    def increase_amount(self):
+    def increase_amount(self, amount=5):
         """Increase food amount by 5 gr"""
 
-        self.amount += 5
+        self.amount += amount
         self.update_macros()
 
-    def decrease_amount(self):
+    def decrease_amount(self, amount=5):
         """Decrease food amount by 5 gr"""
 
-        self.amount -= 5
+        self.amount -= amount
         self.update_macros()
 
     def update_macros(self):
@@ -398,9 +445,6 @@ def promptFood(macros):
     
     return foodChoice
 
-def createMealPlan(targetMacros, treatChoice, foodChoice):
-    pass # maybe should be a method of MealPlan class
-
 # main execution code
 # if __name__ == '__main__':
 #     macros, caloriePerAct, macrosPerGoal = loadDatasets()
@@ -411,29 +455,36 @@ def createMealPlan(targetMacros, treatChoice, foodChoice):
 ### TEST ###
 macros = pd.read_csv('Codecademy/macros.csv')
 targetMacros = pd.DataFrame({'calories':[2434.5],
-                             'proteins':[148.9],
-                             'carbs':[312.4],
+                             'proteins':[180.0],
+                             'carbs':[300.0],
                              'fats':[60.7]})
 breakfast = Meal()
-breakfast.total_calories = 788.4
-breakfast.total_proteins = 36.7
-breakfast.total_carbs = 99.1
-breakfast.total_fats = 	26.2
+rice = Food('rice', macros)
+egg = Food('wholeegg', macros)
+breakfast.food_list = [rice, egg]
 
 lunch = Meal()
-lunch.total_calories = 700.7
-lunch.total_proteins = 	0.6
-lunch.total_carbs = 95.6
-lunch.total_fats = 	6.6
+rice2 = Food('rice', macros)
+chicken = Food('chickenbreast', macros)
+beans = Food('greenbeans', macros)
+lunch.food_list = [rice2, chicken, beans]
 
 dinner = Meal()
-dinner.total_calories = 752.2
-dinner.total_proteins = 56.2
-dinner.total_carbs = 95.6
-dinner.total_fats = 14.2
+rice3 = Food('rice', macros)
+steak = Food('porterhouse', macros)
+beans2 = Food('greenbeans', macros)
+dinner.food_list = [rice3, steak, beans2]
 
-meal_plan = MealPlan(targetMacros=targetMacros, meal_list=[breakfast, lunch, dinner])
-meal_plan.update_macros()
+treats = Meal()
+chocolate = Food('darkchocolate', macros)
+treats.food_list = [chocolate]
+                    
+meal_plan = MealPlan(targetMacros=targetMacros, meal_list=[breakfast, lunch, dinner, treats])
+meal_plan.createMealPlan()
 print("target proteins:", meal_plan.targetMacros['proteins'].item())
 print("total proteins:", meal_plan.show_result()['proteins'])
-print("target reached:", meal_plan.reach_target_proteins())
+print("target carbs:", meal_plan.targetMacros['carbs'].item())
+print("total carbs:", meal_plan.show_result()['carbs'])
+for meal in meal_plan.meal_list:
+    for food in meal.food_list:
+        print(food.name, food.amount)
