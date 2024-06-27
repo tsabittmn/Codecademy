@@ -1,5 +1,9 @@
 # imports
 import pandas as pd
+import joblib
+
+# Load the trained model from the file
+carbs_classifier = joblib.load('Codecademy/kmeans_model.pkl')
 
 # clas definitions
 class MealPlan:
@@ -452,39 +456,44 @@ def promptFood(macros):
 #     targetMacros = calcMacros(weight, actLevel, fitGoal, caloriePerAct, macrosPerGoal)
 #     treatChoice, foodChoice = getMenu(macros, targetMacros)
 
-### TEST ###
-macros = pd.read_csv('Codecademy/macros.csv')
-targetMacros = pd.DataFrame({'calories':[2434.5],
-                             'proteins':[180.0],
-                             'carbs':[300.0],
-                             'fats':[60.7]})
-breakfast = Meal()
-rice = Food('rice', macros)
-egg = Food('wholeegg', macros)
-breakfast.food_list = [rice, egg]
+### MealPlan TEST ###
+# macros = pd.read_csv('Codecademy/macros.csv')
+# targetMacros = pd.DataFrame({'calories':[2434.5],
+#                              'proteins':[180.0],
+#                              'carbs':[300.0],
+#                              'fats':[60.7]})
+# breakfast = Meal()
+# rice = Food('rice', macros)
+# egg = Food('wholeegg', macros)
+# breakfast.food_list = [rice, egg]
 
-lunch = Meal()
-rice2 = Food('rice', macros)
-chicken = Food('chickenbreast', macros)
-beans = Food('greenbeans', macros)
-lunch.food_list = [rice2, chicken, beans]
+# lunch = Meal()
+# rice2 = Food('rice', macros)
+# chicken = Food('chickenbreast', macros)
+# beans = Food('greenbeans', macros)
+# lunch.food_list = [rice2, chicken, beans]
 
-dinner = Meal()
-rice3 = Food('rice', macros)
-steak = Food('porterhouse', macros)
-beans2 = Food('greenbeans', macros)
-dinner.food_list = [rice3, steak, beans2]
+# dinner = Meal()
+# rice3 = Food('rice', macros)
+# steak = Food('porterhouse', macros)
+# beans2 = Food('greenbeans', macros)
+# dinner.food_list = [rice3, steak, beans2]
 
-treats = Meal()
-chocolate = Food('darkchocolate', macros)
-treats.food_list = [chocolate]
+# treats = Meal()
+# chocolate = Food('darkchocolate', macros)
+# treats.food_list = [chocolate]
                     
-meal_plan = MealPlan(targetMacros=targetMacros, meal_list=[breakfast, lunch, dinner, treats])
-meal_plan.createMealPlan()
-print("target proteins:", meal_plan.targetMacros['proteins'].item())
-print("total proteins:", meal_plan.show_result()['proteins'])
-print("target carbs:", meal_plan.targetMacros['carbs'].item())
-print("total carbs:", meal_plan.show_result()['carbs'])
-for meal in meal_plan.meal_list:
-    for food in meal.food_list:
-        print(food.name, food.amount)
+# meal_plan = MealPlan(targetMacros=targetMacros, meal_list=[breakfast, lunch, dinner, treats])
+# meal_plan.createMealPlan()
+# print("target proteins:", meal_plan.targetMacros['proteins'].item())
+# print("total proteins:", meal_plan.show_result()['proteins'])
+# print("target carbs:", meal_plan.targetMacros['carbs'].item())
+# print("total carbs:", meal_plan.show_result()['carbs'])
+# for meal in meal_plan.meal_list:
+#     for food in meal.food_list:
+#         print(food.name, food.amount)
+
+## CarbsClassifier TEST ##
+macros = pd.read_csv('Codecademy/macros.csv')
+print("Broccoli classified as:", carbs_classifier.predict(macros[macros['food']=='broccoli'][['calories', 'proteins', 'carbs', 'fats']]))
+print("Pasta as:", carbs_classifier.predict(macros[macros['food']=='pasta'][['calories', 'proteins', 'carbs', 'fats']]))
